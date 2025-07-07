@@ -9,7 +9,7 @@ require (
 )
 
 replace (
-	github.com/einsitang/gin-security => /Users/einsitang/github/sevlow/gin-security
+	github.com/einsitang/gin-security => ../
 	github.com/einsitang/go-security => /Users/einsitang/github/sevlow/go-security
 )
 
