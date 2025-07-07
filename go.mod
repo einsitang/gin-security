@@ -3,7 +3,6 @@ module github.com/einsitang/gin-security
 go 1.23.0
 
 require (
-	github.com/bytedance/sonic v1.13.3
 	github.com/einsitang/go-security v0.0.0
 	github.com/gin-gonic/gin v1.10.1
 )
@@ -11,6 +10,7 @@ require (
 replace github.com/einsitang/go-security => /Users/einsitang/github/sevlow/go-security
 
 require (
+	github.com/bytedance/sonic v1.13.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/bzick/tokenizer v1.4.10 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect

@@ -89,7 +89,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(gin.Recovery())
-	// r.Use(se.WithPartol())
+	// r.Use(se.WithSentinel())
 
 	r.POST("/v1/api/login", func(c *gin.Context) {
 		username := "hello"
