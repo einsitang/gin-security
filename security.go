@@ -13,7 +13,7 @@ type GinSe interface {
 	WhiteList() []string
 
 	// gin global middleware
-	WithPartol() gin.HandlerFunc
+	WithSentinel() gin.HandlerFunc
 
 	// gin endpoint middleware
 	WithGuard(express string) gin.HandlerFunc
@@ -37,7 +37,7 @@ type ginSe struct {
 	TokenName      string
 	AuthFromHeader bool
 
-	partol    security.Partol
+	sentinel  security.Sentinel
 	whiteList []string
 
 	// callback handlers
@@ -51,7 +51,7 @@ func (g *ginSe) WhiteList() []string {
 	return g.whiteList
 }
 
-func (g *ginSe) WithPartol() gin.HandlerFunc {
+func (g *ginSe) WithSentinel() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		fullpath := c.FullPath()
@@ -78,7 +78,7 @@ func (g *ginSe) WithPartol() gin.HandlerFunc {
 			return
 		}
 
-		chekced, _ := g.partol.Check(fullpath, principal)
+		chekced, _ := g.sentinel.Check(fullpath, principal)
 		if chekced {
 			c.Next()
 		} else {
@@ -150,7 +150,7 @@ func (g *ginSe) DoPrincipalHandler(h DoPrincipalHandler) {
 }
 
 func New() (GinSe, error) {
-	partol, err := security.NewPartol()
+	sentinel, err := security.NewSentinel()
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func New() (GinSe, error) {
 	authFromHeader := true
 	whiteList := []string{}
 
-	se := &ginSe{TokenName: tokenName, AuthFromHeader: authFromHeader, partol: partol, whiteList: whiteList}
+	se := &ginSe{TokenName: tokenName, AuthFromHeader: authFromHeader, sentinel: sentinel, whiteList: whiteList}
 	se.forbiddenHandler = defaultForbiddenHandler
 	se.unauthorizedHandler = defaultUnauthorizedHandler
 	se.principalHandler = defaultPrincipalHandler
