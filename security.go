@@ -1,6 +1,7 @@
 package ginse
 
 import (
+	"fmt"
 	"log"
 	"slices"
 
@@ -70,6 +71,7 @@ func (g *ginSe) WithSentinel() gin.HandlerFunc {
 			return
 		}
 
+		// TODO 等待 go-security 更新api接入自定义参数
 		_ = customParam
 
 		if principal == nil {
@@ -78,7 +80,10 @@ func (g *ginSe) WithSentinel() gin.HandlerFunc {
 			return
 		}
 
-		chekced, _ := g.sentinel.Check(fullpath, principal)
+		method := c.Request.Method
+		endpoint := fmt.Sprintf("%s %s", method, fullpath)
+
+		chekced, _ := g.sentinel.Check(endpoint, principal)
 		if chekced {
 			c.Next()
 		} else {
@@ -95,9 +100,6 @@ func (g *ginSe) WithGuard(express string) gin.HandlerFunc {
 	}
 	return func(c *gin.Context) {
 		params := map[string]any{}
-		// for _, param := range c.Params {
-		// 	params[param.Key] = param.Value
-		// }
 		for k, vs := range c.Request.URL.Query() {
 			params[k] = vs[0]
 		}
@@ -117,8 +119,9 @@ func (g *ginSe) WithGuard(express string) gin.HandlerFunc {
 		}
 		_ = customParam
 		var context = &security.SecurityContext{
-			Principal: principal,
-			Params:    params,
+			Principal:    principal,
+			Params:       params,
+			CustomParams: customParam,
 		}
 		checked, err := guard.Check(context)
 		if err != nil {
