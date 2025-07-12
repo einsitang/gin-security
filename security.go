@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type DoPrincipalHandler func(c *gin.Context) (security.SecurityPrincipal, map[string]string, error)
 type GinSe interface {
 	// return white list , white list will skip check
 	WhiteList() []string
@@ -32,8 +33,6 @@ type GinSe interface {
 	DoPrincipalHandler(DoPrincipalHandler)
 }
 
-type DoPrincipalHandler func(c *gin.Context) (security.SecurityPrincipal, map[string]any, error)
-
 type ginSe struct {
 	TokenName      string
 	AuthFromHeader bool
@@ -56,6 +55,7 @@ func (g *ginSe) WithSentinel() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		fullpath := c.FullPath()
+		// 跳过白名单
 		if slices.Contains(g.WhiteList(), fullpath) {
 			c.Next()
 			return
@@ -71,9 +71,6 @@ func (g *ginSe) WithSentinel() gin.HandlerFunc {
 			return
 		}
 
-		// TODO 等待 go-security 更新api接入自定义参数
-		_ = customParam
-
 		if principal == nil {
 			// 401
 			g.unauthorizedHandler(c)
@@ -83,7 +80,7 @@ func (g *ginSe) WithSentinel() gin.HandlerFunc {
 		method := c.Request.Method
 		endpoint := fmt.Sprintf("%s %s", method, fullpath)
 
-		chekced, _ := g.sentinel.Check(endpoint, principal)
+		chekced, _ := g.sentinel.Check(endpoint, principal, customParam)
 		if chekced {
 			c.Next()
 		} else {
@@ -117,7 +114,7 @@ func (g *ginSe) WithGuard(express string) gin.HandlerFunc {
 			g.unauthorizedHandler(c)
 			return
 		}
-		_ = customParam
+
 		var context = &security.SecurityContext{
 			Principal:    principal,
 			Params:       params,
@@ -152,7 +149,14 @@ func (g *ginSe) DoPrincipalHandler(h DoPrincipalHandler) {
 	g.principalHandler = h
 }
 
-func New() (GinSe, error) {
+type GinSecurityOption func(*ginSe)
+
+func WithWhiteList(whiteList []string) GinSecurityOption {
+	return func(g *ginSe) {
+		g.whiteList = whiteList
+	}
+}
+func New(options ...GinSecurityOption) (GinSe, error) {
 	sentinel, err := security.NewSentinel()
 	if err != nil {
 		return nil, err
@@ -167,10 +171,14 @@ func New() (GinSe, error) {
 	se.unauthorizedHandler = defaultUnauthorizedHandler
 	se.principalHandler = defaultPrincipalHandler
 
+	for _, option := range options {
+		option(se)
+	}
+
 	return se, nil
 }
 
-func defaultPrincipalHandler(c *gin.Context) (security.SecurityPrincipal, map[string]any, error) {
+func defaultPrincipalHandler(c *gin.Context) (security.SecurityPrincipal, map[string]string, error) {
 	panic("not implement principalHandler")
 }
 

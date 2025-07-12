@@ -28,10 +28,10 @@ func (e *ExamplePrincipal) Roles() []string {
 }
 
 func main() {
-	gse, _ := ginse.New()
+	gse, _ := ginse.New(ginse.WithWhiteList([]string{"/api/v1/login"}))
 
 	// Pricipal Handler
-	gse.DoPrincipalHandler(func(c *gin.Context) (security.SecurityPrincipal, map[string]any, error) {
+	gse.DoPrincipalHandler(func(c *gin.Context) (security.SecurityPrincipal, map[string]string, error) {
 
 		// tokenName := "Authorization"
 		// var tokenValue string
@@ -61,14 +61,17 @@ func main() {
 		// mysql
 		// memory
 
-		// for demo
+		// principal for demo
 		principal := &ExamplePrincipal{
 			id: "test",
 			roles: []string{
 				"admin",
 			},
 		}
-		return principal, nil, nil
+		// 自定义参数
+		customParams := map[string]string{}
+
+		return principal, customParams, nil
 	})
 
 	// 注册 401 hander 认证失败 handler
