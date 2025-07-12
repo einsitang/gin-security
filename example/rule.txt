@@ -1,0 +1,6 @@
+# 仅支持 POST 方法拦截检查
+POST /api/v1/test?a=:a, allow:Group('developer') or $a == 'hello'
+# 忽略 method
+/api/v1/books?category=:category, allow:Role('admin') and $category == '2'
+# 仅支持 GET 或者 POST 方法拦截检查
+GET/POST /api/v1/files/:year/:month/:day/:filename, allow:Role('admin') and $year == '2025' and $month == '05'

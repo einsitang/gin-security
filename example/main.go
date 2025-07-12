@@ -29,7 +29,11 @@ func (e *ExamplePrincipal) Roles() []string {
 
 func main() {
 	whiteList := []string{"/api/v1/login"}
-	gse, _ := ginse.New(ginse.WithWhiteList(whiteList))
+	gse, err := ginse.New(ginse.WithWhiteList(whiteList), ginse.WithRules("rule.txt"))
+	// gse,err := ginse.New(ginse.WithWhiteList(whiteList))
+	if err != nil {
+		panic(err)
+	}
 
 	// Pricipal Handler
 	gse.DoPrincipalHandler(func(c *gin.Context) (security.SecurityPrincipal, map[string]string, error) {
@@ -93,9 +97,10 @@ func main() {
 
 	r := gin.Default()
 	r.Use(gin.Recovery())
-	// r.Use(se.WithSentinel())
+	// WithSentinel 用于gin全局路由拦截，会再使用内部路由树匹配
+	r.Use(gse.WithSentinel())
 
-	r.POST("/v1/api/login", func(c *gin.Context) {
+	r.POST("/api/v1/login", func(c *gin.Context) {
 		username := "hello"
 		param := map[string]any{
 			"username": username,
@@ -109,8 +114,22 @@ func main() {
 			"accessToken": accessToken,
 		})
 	})
+
+	r.POST("/api/v1/test", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"test": "POST METHOD IS OK",
+		})
+	})
+
+	r.GET("/api/v1/test", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"test": "GET METHOD IS OK",
+		})
+	})
+
+	// WithGuard 仅对当前 gin 的路由结果进行拦截检查，不建议 WithGuard 与 WithSentinel 一起使用, 容易造成双从检查
 	express := "allow:Role('admin') and $age > 18"
-	r.GET("/v1/api/users", gse.WithGuard(express), func(c *gin.Context) {
+	r.GET("/api/v1/users", gse.WithGuard(express), func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"helo": "world",
 		})
