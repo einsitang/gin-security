@@ -34,9 +34,6 @@ type GinSe interface {
 }
 
 type ginSe struct {
-	TokenName      string
-	AuthFromHeader bool
-
 	sentinel  security.Sentinel
 	whiteList []string
 
@@ -149,24 +146,22 @@ func (g *ginSe) DoPrincipalHandler(h DoPrincipalHandler) {
 	g.principalHandler = h
 }
 
-type GinSecurityOption func(*ginSe)
+type GinSeOption func(*ginSe)
 
-func WithWhiteList(whiteList []string) GinSecurityOption {
+func WithWhiteList(whiteList []string) GinSeOption {
 	return func(g *ginSe) {
 		g.whiteList = whiteList
 	}
 }
-func New(options ...GinSecurityOption) (GinSe, error) {
+func New(options ...GinSeOption) (GinSe, error) {
 	sentinel, err := security.NewSentinel()
 	if err != nil {
 		return nil, err
 	}
 
-	tokenName := "Authorization"
-	authFromHeader := true
 	whiteList := []string{}
 
-	se := &ginSe{TokenName: tokenName, AuthFromHeader: authFromHeader, sentinel: sentinel, whiteList: whiteList}
+	se := &ginSe{sentinel: sentinel, whiteList: whiteList}
 	se.forbiddenHandler = defaultForbiddenHandler
 	se.unauthorizedHandler = defaultUnauthorizedHandler
 	se.principalHandler = defaultPrincipalHandler

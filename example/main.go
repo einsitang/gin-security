@@ -28,7 +28,8 @@ func (e *ExamplePrincipal) Roles() []string {
 }
 
 func main() {
-	gse, _ := ginse.New(ginse.WithWhiteList([]string{"/api/v1/login"}))
+	whiteList := []string{"/api/v1/login"}
+	gse, _ := ginse.New(ginse.WithWhiteList(whiteList))
 
 	// Pricipal Handler
 	gse.DoPrincipalHandler(func(c *gin.Context) (security.SecurityPrincipal, map[string]string, error) {
