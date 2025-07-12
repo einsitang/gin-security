@@ -30,14 +30,15 @@ if err != nil {
 }
 ```
 
-- [WithWhiteList](file:///Users/einsitang/github/sevlow/gin-security/security.go#L191-L196)：设置不需要进行权限校验的路径。
-- [WithRules](file:///Users/einsitang/github/sevlow/gin-security/security.go#L198-L207)：指定权限规则文件路径（如 [rule.txt](file:///Users/einsitang/github/sevlow/gin-security/example/rule.txt)），用于 `Sentinel` 模式下的全局路由保护。
+`GinSe` 可选配置:
+- WithWhiteList 设置不需要进行权限校验的路径。
+- WithRules：指定权限规则文件路径（如 [rule.txt](./example/rule.txt)）快速构建 端点 与 路由表达式 的映射关系
 
 ---
 
 ### 2. 设置 Principal Handler
 
-Principal 是当前请求用户的抽象表示。你需要实现 [DoPrincipalHandler](file:///Users/einsitang/github/sevlow/gin-security/security.go#L12-L12) 来返回当前用户信息：
+Principal 是当前请求用户的抽象表示。你需要注册DoPrincipalHandler 来返回当前用户信息：
 
 ```go
 gse.DoPrincipalHandler(func(c *gin.Context) (security.SecurityPrincipal, map[string]string, error) {
@@ -55,7 +56,7 @@ gse.DoPrincipalHandler(func(c *gin.Context) (security.SecurityPrincipal, map[str
 })
 ```
 
-其中 [ExamplePrincipal](file:///Users/einsitang/github/sevlow/gin-security/example/main.go#L11-L14) 需要实现 `SecurityPrincipal` 接口：
+其中 `ExamplePrincipal` 需要实现 `SecurityPrincipal` 接口：
 
 ```go
 type ExamplePrincipal struct {
@@ -95,7 +96,7 @@ gse.DoForbiddenHandler(func(c *gin.Context) {
 
 ### ✅ 全局中间件
 
-使用 [WithSentinel()](../security.go#L22-L22) 作为全局中间件，根据规则文件自动拦截并验证请求：
+使用 `WithSentinel()` 作为全局中间件，根据规则文件自动拦截并验证请求：
 
 ```go
 r.Use(gse.WithSentinel())
