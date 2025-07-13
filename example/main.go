@@ -41,14 +41,16 @@ func main() {
 		// tokenName := "Authorization"
 		// var tokenValue string
 
-		// // from cookie
+		// from cookie
+		// 从 Cookie 中读取 token
 		// tokenValueFromCookie, err := c.Cookie(tokenName)
 		// if err != nil {
 		// 	return nil, nil, err
 		// }
 		// tokenValue = tokenValueFromCookie
 
-		// // from header
+		// from header
+		// 从 Http Header 中读取 token
 		// tokenValue = c.GetHeader(tokenName)
 		// if tokenName == "" {
 		// 	return nil, nil, errors.New("not found token")
@@ -58,9 +60,10 @@ func main() {
 		// 	return nil, nil, errors.New("token format error")
 		// }
 
-		// jwt parse
+		// jwt parse JWT解析出数据 (principal)
 		// jwtUtils.parse(tokenValue)
 
+		// 根据 token 从内存/缓存/甚至数据库中恢复会话并取出 principal
 		// read session from storage
 		// redis
 		// mysql
@@ -81,7 +84,7 @@ func main() {
 
 	// 注册 401 hander 认证失败 handler
 	// gse.DoUnauthorizedHandler(func(c *gin.Context) {
-	// 	c.JSON(401, gin.H{
+	// 	c.JSON(http.StatusForbidden, gin.H{
 	// 		"message": "unauthorized",
 	// 	})
 	// 	c.Abort()
@@ -89,7 +92,7 @@ func main() {
 
 	// // 注册 403 hander 权限验证失败 handler
 	// gse.DoForbiddenHandler(func(c *gin.Context) {
-	// 	c.JSON(403, gin.H{
+	// 	c.JSON(http.StatusUnauthorized, gin.H{
 	// 		"message": "forbidden",
 	// 	})
 	// 	c.Abort()
@@ -115,12 +118,14 @@ func main() {
 		})
 	})
 
+	// rule.txt match
 	r.POST("/api/v1/test", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"test": "POST METHOD IS OK",
 		})
 	})
 
+	// rule.txt not match GET /api/v1/test
 	r.GET("/api/v1/test", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"test": "GET METHOD IS OK",

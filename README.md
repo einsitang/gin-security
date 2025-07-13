@@ -14,7 +14,7 @@ go get github.com/einsitang/gin-security
 
 ## 🔐 快速开始
 
-### 1. 初始化 GinSecurity 实例
+### 1. 初始化 GinSe 实例
 
 使用 [ginse.New()](file:///Users/einsitang/github/sevlow/gin-security/security.go#L208-L232) 创建一个安全中间件实例，并配置白名单和规则文件：
 
@@ -38,7 +38,7 @@ if err != nil {
 
 ### 2. 设置 Principal Handler
 
-Principal 是当前请求用户的抽象表示。你需要注册DoPrincipalHandler 来返回当前用户信息：
+Principal 是当前请求用户的抽象表示。你需要注册 DoPrincipalHandler 来返回当前用户信息：
 
 ```go
 gse.DoPrincipalHandler(func(c *gin.Context) (security.SecurityPrincipal, map[string]string, error) {
@@ -80,12 +80,12 @@ func (e *ExamplePrincipal) Roles() []string      { return e.roles }
 
 ```go
 gse.DoUnauthorizedHandler(func(c *gin.Context) {
-    c.JSON(401, gin.H{"message": "unauthorized"})
+    c.JSON(http.StatusForbidden, gin.H{"message": "unauthorized"})
     c.Abort()
 })
 
 gse.DoForbiddenHandler(func(c *gin.Context) {
-    c.JSON(403, gin.H{"message": "forbidden"})
+    c.JSON(http.StatusUnauthorized, gin.H{"message": "forbidden"})
     c.Abort()
 })
 ```
@@ -124,9 +124,10 @@ r.GET("/api/v1/users", gse.WithGuard(express), func(c *gin.Context) {
 
 | 表达式                         | 含义                        |
 |------------------------------|-----------------------------|
-| `allow:Role('admin')`        | 用户角色中包含 `admin`       |
-| `allow:Permission('write')`  | 用户具有 `write` 权限         |
-| `$age > 18`                  | 请求参数中 `age > 18`        |
+| `allow:Role('admin')`        | 用户角色中包含 `admin` 则放行  |
+| `allow:Permission('write')`  | 用户具有 `write` 权限  则放行  |
+| `$age > 18`                  | 请求参数中 `age > 18`         |
+| deny:Role('guest')`          | 用户角色包含 `guest`  则禁行   |
 
 ---
 
@@ -148,7 +149,7 @@ POST /api/v1/test, allow:Permission('user.create')
 例如：
 
 ```
-GET /api/v1/users, allow:Role('admin') and $age > 18
+GET /api/v1/users?age=:age, allow:Role('admin') and $age > 18
 POST /api/v1/users, allow:Permission('user.create')
 ```
 
@@ -162,7 +163,7 @@ GET /api/v1/users, allow: 1 == 1
 GET/POST /api/v2/users, allow: Roles('admin','manager')
 
 // 忽略则通配
-/api/v3/users, deny: !Role('guest')
+/api/v3/users, deny: !Role('admin')
 ```
 ---
 
@@ -185,6 +186,6 @@ GET/POST /api/v2/users, allow: Roles('admin','manager')
 
 完整示例可参考：[example](./example)
 
---- 
+---
 
 如需进一步帮助，请查看 `go-security` 的文档或提交 issue 到本项目的 GitHub。
