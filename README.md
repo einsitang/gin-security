@@ -1,5 +1,7 @@
 # gin-security
 
+[![Release](https://img.shields.io/github/v/release/einsitang/gin-security.svg?style=flat-square)](https://github.com/einsitang/gin-security/releases)
+
 `gin-security` 是一个基于 [Gin](https://github.com/gin-gonic/gin) 和 [go-security](https://github.com/einsitang/go-security) 的权限控制中间件，支持 **基于角色/权限的访问控制**（RBAC）以及 **表达式规则验证**。
 
 ---

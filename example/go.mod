@@ -3,7 +3,7 @@ module github.com/einsitang/gin-security-example
 go 1.23.0
 
 require (
-	github.com/einsitang/gin-security v0.0.0
+	github.com/einsitang/gin-security v0.1.0
 	github.com/einsitang/go-security v0.1.0
 	github.com/gin-gonic/gin v1.10.1
 )
