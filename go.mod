@@ -3,11 +3,9 @@ module github.com/einsitang/gin-security
 go 1.23.0
 
 require (
-	github.com/einsitang/go-security v0.0.0
+	github.com/einsitang/go-security v0.1.0
 	github.com/gin-gonic/gin v1.10.1
 )
-
-replace github.com/einsitang/go-security => /Users/einsitang/github/sevlow/go-security
 
 require (
 	github.com/bytedance/sonic v1.13.3 // indirect
